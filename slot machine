@@ -1,0 +1,144 @@
+#!/bin/bash
+balance=5
+highscore=0
+#"Customizable" Symbols
+while true; do
+    echo "choose symbols"
+    echo "1) (😃 😐 😇 😎 🤯 👀)"
+    echo "2) (👈 👆 👉 👍 🤙 👀)"
+    echo "3) (🍎 🥐 🍫 🥓 🍪 👀)"
+    read -p " . . . "  Custom
+    if [[ $Custom == 1 ]]; then
+        symbols=(😃 😐 😇 😎 ☠️ 👀)
+        break
+    elif [[ $Custom == 2 ]]; then
+        symbols=(👈 👆 👉 👍 🤙 👀)
+        break
+    elif  [[ $Custom == 3 ]]; then
+        symbols=(🍎 🥐 🍫 🥓 🍪 👀)
+        break
+    else 
+        echo "incorect choice choose agian"
+    fi
+done
+symbols2=(👀 🍫 😎 👍 🍪 👀)
+while true; do
+    echo "gambling money: \$${balance}"
+    echo "1) get more gambling mone"
+    echo "2) Go gambling"
+    echo "3) Withdraw winnings"
+    echo "4) not gamble"
+    echo "5) special gambling mode 500+ bet (choice symbols are invalid in this gamemode)"
+    read -p "Let's " choice
+    if [[ $choice = 1 ]]; then
+        read -p "how much gambling money: " deposit
+        if [[ $deposit =~ ^[0-9]+$ && $deposit -gt 0 ]]; then
+            balance=$((balance + deposit))
+            echo "lets go gambling"
+        else
+            echo "enter positive amount"
+        fi
+    elif [[ $choice = 2 ]]; then
+        read -p "Enter bet amount: " bet
+        if [[ ! $bet =~ ^[0-9]+$ || $bet -le 0 || $bet -gt $balance ]]; then
+            echo "Invalid bet. Enter a number between 1 and your balance."
+            continue
+        fi
+        x=0
+        while  [ $x -lt "10" ]; do
+            uno=${symbols[$RANDOM % 6]}
+            dos=${symbols[$RANDOM % 6]}
+            three=${symbols[$RANDOM % 6]}
+            echo "$uno" "$dos"  "$three"
+          
+            sleep 0.5
+            clear
+        x=$(($x + 1 ))
+        done
+        echo "$uno" "$dos"  "$three"
+        #Bonus Symbol Feature
+        if [[ "$uno" == "👀" && "$uno" == "$dos" && "$dos" == "$three" ]]; then
+            winnings=$((bet * 4))
+            echo "wooo epic bonus +\$${winnings}"
+            balance=$((balance + winnings))
+        elif [[ "uno" == "👀" && "$uno" == "$dos" || "dos" == "👀" && "$dos" == "$three" || "uno" == "👀" && "$uno" == "$three" ]]; then
+            winnings=$((bet * 2))
+            echo "regular bonus +\$${winnings}"
+            balance=$((balance + winnings))
+        else 
+            echo "no bouns won"
+        fi
+        if [[ "$uno" == "$dos" && "$dos" == "$three" ]]; then
+            winnings=$((bet * 10))
+            echo "Whooo! You win +\$${winnings}"
+            balance=$((balance + winnings))
+        elif [[ "$uno" == "$dos" || "$dos" == "$three" || "$uno" == "$three" ]]; then
+            winnings=$((bet * 3))
+            echo "eh: You win +\$${winnings}"
+            balance=$((balance + winnings))
+        else
+            echo "Aw Dang It!"
+             balance=$((balance - $bet))
+        fi
+    elif [[ $choice = 3 ]]; then
+        read -p "how much " withdraw
+        if [[ $withdraw =~ ^[0-9] && $withdraw -le $balance && $withdraw -gt 0 ]]; then
+            balance=$((balance - $withdraw))
+            echo "enjoy your  winnings"
+        else
+            echo "too poor"
+        fi
+    elif [[ $choice = 4 ]]; then
+        #High Score
+        if [[ $balance -gt $highscore ]]; then
+            highscore=$((balance))
+        fi
+        echo "your highscore was $highscore"
+        echo "come gamble agian soon"; exit
+    elif [[ $choice = 5 ]]; then
+        #Special Reels Mode
+        read -p "Enter bet amount 500+: " bet
+        if [[ ! $bet =~ ^[0-9]+$ || $bet -le 499 || $bet -gt $balance ]]; then
+            echo "Invalid bet. Enter a number between 500 and your balance."
+            continue
+        fi
+        x=0
+        while  [ $x -lt "10" ]; do
+            uno1=${symbols2[$RANDOM % 6]}
+            dos2=${symbols2[$RANDOM % 6]}
+            three3=${symbols2[$RANDOM % 6]}
+            echo "$uno1" "$dos2"  "$three3"
+          
+            sleep 0.5
+            clear
+        x=$(($x + 1 ))
+        done
+        echo "$uno1" "$dos2"  "$three3"
+        #Bonus Symbol Feature
+        if [[ "$uno1" == "👀" && "$uno1" == "$dos2" && "$dos2" == "$three3" ]]; then
+            winnings=$((bet * 4))
+            echo "wooo epic bonus +\$${winnings}"
+            balance=$((balance + winnings))
+        elif [[ "uno1" == "👀" && "$uno1" == "$dos2" || "dos2" == "👀" && "$dos2" == "$three3" || "uno1" == "👀" && "$uno1" == "$three3" ]]; then
+            winnings=$((bet * 2))
+            echo "regular bonus +\$${winnings}"
+            balance=$((balance + winnings))
+        else 
+            echo "no bouns won"
+        fi
+        if [[ "$uno1" == "$dos2" && "$dos2" == "$three3" ]]; then
+            winnings=$((bet * 10))
+            echo "Whooo! You win +\$${winnings}"
+            balance=$((balance + winnings))
+        elif [[ "$uno1" == "$dos2" || "$dos2" == "$three3" || "$uno1" == "$three3" ]]; then
+            winnings=$((bet * 3))
+            echo "eh: You win +\$${winnings}"
+            balance=$((balance + winnings))
+        else
+            echo "Aw Dang It!"
+             balance=$((balance - $bet))
+        fi
+    else 
+        echo "invalid response please choose agian"
+    fi
+done
